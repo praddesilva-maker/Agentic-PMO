@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# pre-push hook — blocks the push if scripts/verify.sh fails.
+#
+# This file is tracked in the repo (scripts/hooks/pre-push) because .git/hooks/
+# is never version-controlled. It has no effect until installed — see
+# scripts/hooks/README.md for the one-line install command.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+echo "pre-push: running scripts/verify.sh before allowing push..."
+"$REPO_ROOT/scripts/verify.sh"
+STATUS=$?
+
+if [ "$STATUS" -ne 0 ]; then
+  echo ""
+  echo "pre-push: verify.sh failed (exit $STATUS). Push blocked."
+  exit 1
+fi
+
+exit 0
