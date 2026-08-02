@@ -1,6 +1,6 @@
 # STATE.md
 
-_Last updated: 2026-08-02_
+_Last updated: 2026-08-02 (RT-001 Stage 1+2)_
 
 ## Where we are
 
@@ -11,25 +11,48 @@ deliverable.
 - Phase 0 (Audit): complete. Baseline report delivered 2026-08-02; no
   application stack, no test suite, 8/8 `verify.sh` checks blocked.
 - Phase 1 (Scaffold): complete, gate approved 2026-08-02.
-- Phase 2 (Verification + ratchet): in progress — this PR.
+- Phase 2 (Verification + ratchet): complete, gate approved 2026-08-02.
   - `scripts/verify.sh` check 8 fixed (was checking the stale `docs/adr/`
     path; now checks the real `docs/engineering/01-architect/adr/`).
   - `docs/engineering/ratchet.json` created — 7 of 8 checks recorded as
     `blocked` (no stack/tools exist; explicitly not the same as a `0`
     baseline), check 8 `ok_after_path_fix`.
-  - **Open**: branch protection on `main`. Per Section 0, no agent has
-    write access to branch-protection settings — this is a human action.
-    Recommended settings for `praddesilva-maker/Agentic-PMO` → Settings →
-    Branches → rule on `main`: require a PR before merging, require status
-    checks once CI reports `verify.sh`, disallow force pushes and deletions.
-- Phase 3 (Rehearsal ticket): not started. Planned direction (agreed
-  2026-08-02): a small, non-stack-dependent addition to the BMAD tooling
-  layer, run through all six Section 2 stages, rather than an arbitrary
-  stub in an as-yet-unchosen application stack.
+  - Branch protection on `main` enabled by the human (2026-08-02) —
+    Section 0 gives agents no write access to that setting.
+- Phase 3 (Rehearsal ticket): **in progress — ticket RT-001**, "quickstart
+  skill-name validator." A small, non-stack-dependent addition to the BMAD
+  tooling layer, run through all six Section 2 stages.
+  - Stage 1 (spec): Approved, Gate 1 signed off 2026-08-02.
+    `docs/engineering/00-product/specs/RT-001-quickstart-skill-validator.md`
+  - Stage 2 (ADR): Approved, Gate 2 signed off 2026-08-02.
+    `docs/engineering/01-architect/adr/ADR-001-quickstart-skill-validator.md`.
+    **Friction note, on the record per Phase 3's purpose**: Section 1
+    requires the Architect role to run in a session separate from the rest
+    of this work. Honored by dispatching a `Plan` subagent with only the
+    spec as input (no conversation history) rather than writing the ADR
+    in-session — genuinely isolated context, not role-play. It paid off:
+    the subagent caught that a correct AC-1 implementation will fire
+    against the real `quickstart.md` today (the "Known issue" callout
+    backtick-wraps its own broken-name examples), a finding easy to miss
+    with full context of having written that file. Mechanically heavier
+    than staying in-session, though — worth deciding whether this is the
+    standing pattern for every future Architect stage or a rehearsal-only
+    cost.
+  - Docs-only PR (spec + ADR) pushed: `docs/RT-001-spec-design`
+    (branched from `main` post-Phase-1/2-merge, per Section 5). Awaiting
+    merge to `main` before Stage 3 (tests) starts on a `feat/RT-001-*`
+    branch, per Section 2's "spec+ADR merge before any code branch."
+  - **Friction note**: `scripts/hooks/pre-push` blocks every push on this
+    repo right now (checks 1–7 genuinely blocked, no stack exists) —
+    every docs-only push this session has needed an explicit `--no-verify`
+    confirmation. Expected to resolve once a real stack exists and
+    `verify.sh` can actually pass; until then this is a repeat-friction
+    point worth deciding a standing policy for for future tickets.
 - Phase 4 (Burn-down): not started.
 
-**No ticket is currently active.** No spec and no ADR (other than the
-retrospective ADR-000) exists under the Section 2 lifecycle yet.
+**Active ticket: RT-001** (quickstart skill-name validator). Stage 1 and
+Stage 2 both signed off; Stage 3 (tests) starts once the spec+ADR PR
+merges to `main`.
 
 ## Repo map
 
@@ -52,6 +75,6 @@ retrospective ADR-000) exists under the Section 2 lifecycle yet.
 
 ## Next action
 
-Awaiting Phase 2 gate approval. Blocking item: you enabling branch
-protection on `main` (see above) — everything else in Phase 2 is done.
-Once approved: Phase 3 — rehearsal ticket.
+Awaiting review/merge of `docs/RT-001-spec-design` into `main`. Once
+merged: branch `feat/RT-001-quickstart-skill-validator` from `main`,
+start Stage 3 (tests first).

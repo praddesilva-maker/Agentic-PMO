@@ -1,1 +1,1 @@
-Human-owned. Agents draft, human approves. Specs: `<ID>-<slug>.md`. Acceptance: `<ID>-acceptance.md`.
+Human-owned. Agents draft, human approves. Specs: `specs/<ID>-<slug>.md`. Acceptance: `acceptance/<ID>-acceptance.md`.
