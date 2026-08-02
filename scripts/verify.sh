@@ -122,8 +122,8 @@ echo ""
 
 # --- 8. Dependency allow-list check against active ADR ---------------------
 echo "--- [8/8] Dependency allow-list vs. active ADR ---"
-if [ ! -d docs/adr ] || [ -z "$(ls -A docs/adr 2>/dev/null)" ]; then
-  fail "[8/8] Dependency allow-list: no ADR exists under docs/adr/ to check dependencies against."
+if [ ! -d docs/engineering/01-architect/adr ] || [ -z "$(ls -A docs/engineering/01-architect/adr 2>/dev/null)" ]; then
+  fail "[8/8] Dependency allow-list: no ADR exists under docs/engineering/01-architect/adr/ to check dependencies against."
 fi
 echo "would diff manifest dependencies against the allow-list in the active ADR"
 echo "[8/8] OK"
