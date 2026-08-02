@@ -123,6 +123,40 @@ test_missing_skills_dir_fails_clearly() {
   assert_contains "Missing SKILLS_DIR: stderr states the missing path" "$LAST_STDERR" "does-not-exist-dir"
 }
 
+# Added post-Stage-5-review (Reviewer finding #1): an unreadable
+# quickstart.md used to be silently treated as "0 references, all
+# resolved" (exit 0) — the exact silent-pass AC-3's language exists to
+# prevent. Fixture is generated at test time, not committed: git does not
+# preserve chmod 000 across a checkout, so a committed "unreadable" fixture
+# would silently stop being unreadable the moment anyone else clones this.
+test_unreadable_quickstart_file_fails_clearly() {
+  local tmp
+  tmp="$(mktemp)"
+  printf '`bmad-prd` reference in a file this process cannot read.\n' > "$tmp"
+  chmod 000 "$tmp"
+  run_validator "$tmp" "$FIXTURES/ac1/skills"
+  assert_eq "Unreadable quickstart.md: exit code is 2, not a silent pass" "2" "$LAST_EXIT"
+  assert_contains "Unreadable quickstart.md: stderr states the path" "$LAST_STDERR" "$tmp"
+  chmod 644 "$tmp"
+  rm -f "$tmp"
+}
+
+# Added post-Stage-5-review (Reviewer finding #2): a single stray/unclosed
+# backtick anywhere in the file mispairs the `+[^`]+`+ extraction across
+# it, silently dropping a real reference into unmatched noise with no
+# signal — worse than the "zero tokens found" case ADR-001 already
+# accepts, since that's a whole-file signal and this is an undetectable
+# partial one. Now fails loudly under the same exit-2 tier instead.
+test_unbalanced_backticks_fails_clearly() {
+  local tmp
+  tmp="$(mktemp)"
+  printf 'stray backtick ` in prose, and one legit `bmad-prd` ref.\n' > "$tmp"
+  run_validator "$tmp" "$FIXTURES/ac1/skills"
+  assert_eq "Unbalanced backticks: exit code is 2, not a silent partial drop" "2" "$LAST_EXIT"
+  assert_contains "Unbalanced backticks: stderr names the odd count" "$LAST_STDERR" "odd number of backtick"
+  rm -f "$tmp"
+}
+
 # Pinned integration test (ADR-001 Test strategy): runs against the REAL
 # quickstart.md and .claude/skills/, not a fixture. Verified by hand
 # (2026-08-02) before this script existed: exactly these three names are
@@ -143,6 +177,8 @@ run_test test_ac2_all_resolved_with_dedup_and_no_false_positives
 run_test test_ac3_missing_quickstart_file_fails_clearly
 run_test test_missing_skills_dir_fails_clearly
 run_test test_real_quickstart_reports_known_stale_names
+run_test test_unreadable_quickstart_file_fails_clearly
+run_test test_unbalanced_backticks_fails_clearly
 
 echo ""
 echo "=== $PASS passed, $FAIL failed ==="

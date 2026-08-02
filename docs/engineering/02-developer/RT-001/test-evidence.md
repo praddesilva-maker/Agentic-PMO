@@ -101,6 +101,56 @@ Exit code: 0. All 5 tests pass, first implementation attempt — no escalation
 trigger under Section 8 was hit (no failed attempts, not a
 concurrency/crypto/auth/money component, ADR did not flag high-risk).
 
+## GREEN, post-Stage-5-review (2 new regression tests added)
+
+The isolated Stage 5 Reviewer (see `docs/engineering/03-reviewer/RT-001-review.md`)
+independently found two real defects: an unreadable `quickstart.md` silently
+passing (exit 0), and a stray/unbalanced backtick silently dropping a real
+reference from being checked. Both fixed in `scripts/verify-quickstart-skills.sh`;
+two regression tests added (existing 5 untouched, per Stage 4's rule against
+modifying already-committed tests).
+
+Command:
+```
+./tests/scripts/verify-quickstart-skills.test.sh
+```
+
+Output:
+```
+--- test_ac1_unresolved_reference_reported ---
+  ok: AC-1: exit code is 1 when a reference is unresolved
+  ok: AC-1: unresolved name is listed
+  ok: AC-1: resolved name is not reported as unresolved
+--- test_ac2_all_resolved_with_dedup_and_no_false_positives ---
+  ok: AC-2: exit code is 0 when everything resolves
+  ok: AC-2: summary states the deduplicated count (2, not 3)
+  ok: AC-2/regression: multi-word span not treated as a candidate (Option D2, not D1)
+  ok: AC-2/regression: bare module name not treated as a candidate
+--- test_ac3_missing_quickstart_file_fails_clearly ---
+  ok: AC-3: exit code is 2 when quickstart.md is missing
+  ok: AC-3: stderr states the missing path
+  ok: AC-3: no raw bash error text leaks to stdout
+--- test_missing_skills_dir_fails_clearly ---
+  ok: Missing SKILLS_DIR: exit code is 2
+  ok: Missing SKILLS_DIR: stderr states the missing path
+--- test_real_quickstart_reports_known_stale_names ---
+  ok: Real file: exit code is 1 (known stale names present)
+  ok: Real file: bmad-wds-idun reported
+  ok: Real file: bmad-wds-saga reported
+  ok: Real file: bmad-wds-project-brief reported
+  ok: Real file: exactly 3 unresolved, no others
+--- test_unreadable_quickstart_file_fails_clearly ---
+  ok: Unreadable quickstart.md: exit code is 2, not a silent pass
+  ok: Unreadable quickstart.md: stderr states the path
+--- test_unbalanced_backticks_fails_clearly ---
+  ok: Unbalanced backticks: exit code is 2, not a silent partial drop
+  ok: Unbalanced backticks: stderr names the odd count
+
+=== 7 passed, 0 failed ===
+```
+
+Exit code: 0.
+
 ## NFR verification (spec's Non-functional requirements section)
 
 Read-only — code-inspection grep for file-write redirects, stderr/devnull

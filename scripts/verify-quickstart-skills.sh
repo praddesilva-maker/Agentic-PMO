@@ -27,8 +27,32 @@ if [ ! -f "$QUICKSTART_FILE" ]; then
   exit 2
 fi
 
+# Existence alone isn't enough: a -f check on an unreadable file used to let
+# the extraction grep's stderr get swallowed (2>/dev/null) and silently
+# report "0 references found, all resolved" — exactly the silent pass this
+# validator exists to prevent. Caught by Stage 5 review.
+if [ ! -r "$QUICKSTART_FILE" ]; then
+  echo "ERROR: quickstart file not readable at $QUICKSTART_FILE — nothing to validate." >&2
+  exit 2
+fi
+
 if [ ! -d "$SKILLS_DIR" ]; then
   echo "ERROR: skills directory not found at $SKILLS_DIR — nothing to validate against." >&2
+  exit 2
+fi
+
+# A stray/unbalanced backtick anywhere in the file makes the pairwise
+# `+[^`]+`+ extraction below mispair across it, silently dropping a real
+# reference into unmatched noise with no signal at all (worse than the
+# "zero tokens found" case already accepted below, since that's a
+# whole-file signal and this is an undetectable partial one). Caught by
+# Stage 5 review. Failing loudly here, under the same exit-2
+# usage/environment tier the ADR's contract already defines, rather than
+# attempting real markdown parsing (out of scope, see ADR-001 rejected
+# Option B).
+backtick_count="$(grep -o '`' "$QUICKSTART_FILE" 2>/dev/null | wc -l | tr -d '[:space:]')"
+if [ $((backtick_count % 2)) -ne 0 ]; then
+  echo "ERROR: $QUICKSTART_FILE has an odd number of backtick characters ($backtick_count) — likely an unclosed inline-code span. Cannot reliably extract skill-name references; fix the markdown formatting and re-run." >&2
   exit 2
 fi
 
