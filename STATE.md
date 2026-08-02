@@ -1,115 +1,123 @@
 # STATE.md
 
-_Last updated: 2026-08-02 (RT-001 Stage 1-5 complete, awaiting Gate 3 + Stage 6)_
+_Last updated: 2026-08-02 (repo renamed to BMAD Team; RT-001 merged; Agentic PMO brief+PRD drafted)_
 
 ## Where we are
 
-**Migration status**: Section 11 (Migration — adopting these rules in an
-existing repo) is in progress. This file is part of the Phase 1 — Scaffold
-deliverable.
+**This repo is "BMAD Team"** — the BMAD Method tooling/planning
+workspace, renamed 2026-08-02 from "Agentic PMO" (see CLAUDE.md). The
+actual Agentic PMO product now lives in its own repo,
+`/data/ProjectTeams/Agentic PMO`, freshly created and seeded the same day
+(see that repo's own STATE.md/README for its status — it's pre-code,
+brief+PRD only).
 
-- Phase 0 (Audit): complete. Baseline report delivered 2026-08-02; no
-  application stack, no test suite, 8/8 `verify.sh` checks blocked.
+**Migration status**: Section 11 (Migration — adopting these rules in
+this repo) — **Phases 0–3 complete.**
+
+- Phase 0 (Audit): complete, 2026-08-02.
 - Phase 1 (Scaffold): complete, gate approved 2026-08-02.
 - Phase 2 (Verification + ratchet): complete, gate approved 2026-08-02.
-  - `scripts/verify.sh` check 8 fixed (was checking the stale `docs/adr/`
-    path; now checks the real `docs/engineering/01-architect/adr/`).
-  - `docs/engineering/ratchet.json` created — 7 of 8 checks recorded as
-    `blocked` (no stack/tools exist; explicitly not the same as a `0`
-    baseline), check 8 `ok_after_path_fix`.
-  - Branch protection on `main` enabled by the human (2026-08-02) —
-    Section 0 gives agents no write access to that setting.
-- Phase 3 (Rehearsal ticket): **in progress — ticket RT-001**, "quickstart
-  skill-name validator." A small, non-stack-dependent addition to the BMAD
-  tooling layer, run through all six Section 2 stages.
-  - Stage 1 (spec): Approved, Gate 1 signed off 2026-08-02.
-    `docs/engineering/00-product/specs/RT-001-quickstart-skill-validator.md`
-  - Stage 2 (ADR): Approved, Gate 2 signed off 2026-08-02.
-    `docs/engineering/01-architect/adr/ADR-001-quickstart-skill-validator.md`.
-    **Friction note, on the record per Phase 3's purpose**: Section 1
-    requires the Architect role to run in a session separate from the rest
-    of this work. Honored by dispatching a `Plan` subagent with only the
-    spec as input (no conversation history) rather than writing the ADR
-    in-session — genuinely isolated context, not role-play. It paid off:
-    the subagent caught that a correct AC-1 implementation will fire
-    against the real `quickstart.md` today (the "Known issue" callout
-    backtick-wraps its own broken-name examples), a finding easy to miss
-    with full context of having written that file. Mechanically heavier
-    than staying in-session, though — worth deciding whether this is the
-    standing pattern for every future Architect stage or a rehearsal-only
-    cost.
-  - Docs-only PR (spec + ADR) pushed: `docs/RT-001-spec-design`
-    (branched from `main` post-Phase-1/2-merge, per Section 5). Awaiting
-    merge to `main` before Stage 3 (tests) starts on a `feat/RT-001-*`
-    branch, per Section 2's "spec+ADR merge before any code branch."
-  - **Friction note**: `scripts/hooks/pre-push` blocks every push on this
-    repo right now (checks 1–7 genuinely blocked, no stack exists) —
-    every docs-only push this session has needed an explicit `--no-verify`
-    confirmation. Expected to resolve once a real stack exists and
-    `verify.sh` can actually pass; until then this is a repeat-friction
-    point worth deciding a standing policy for for future tickets.
-  - Stage 3 (tests): complete. 5 tests written against ADR-001 before the
-    script existed; genuine RED (0 passed, 5 failed, every failure a real
-    assertion mismatch — see `docs/engineering/02-developer/RT-001/test-evidence.md`).
-  - Stage 4 (implementation): complete.
-    `scripts/verify-quickstart-skills.sh`, all 5 tests GREEN on the first
-    attempt. NFRs (read-only, no network, sub-second, no new deps) verified
-    with evidence, not just claimed.
-  - Stage 5 (review): complete, **CHANGES REQUIRED then fixed**. Run as an
-    isolated `Plan` subagent in a fresh git worktree — genuinely separate
-    context, not role-play, per Section 1. Full verdict:
-    `docs/engineering/03-reviewer/RT-001-review.md`.
-    **Friction note**: the isolated reviewer earned its keep a second
-    time. It independently re-ran everything (didn't trust any of the
-    Developer's pasted output), reproduced the RED state from an earlier
-    commit itself, and found two real, reproducible defects the Developer
-    stage missed entirely: an unreadable `quickstart.md` silently passing
-    (exit 0) instead of the exit 2 the ADR itself documents for that case,
-    and a stray/unbalanced backtick silently dropping a real reference
-    with no signal at all — worse than a risk the ADR explicitly already
-    accepted. It also caught a false claim in the Developer's own commit
-    message (asserted `STATE.md` was updated; it wasn't). Both defects
-    fixed, 2 regression tests added (7 total), all passing. This is
-    strong evidence the separate-session Architect/Reviewer pattern is
-    worth the mechanical overhead noted above, not just a rehearsal-only
-    cost — recommend keeping it as the standing pattern going forward,
-    not just for this rehearsal.
-  - Gate 3 (human reviews the verdict) and Stage 6 (human runs it,
-    merges, tags): **pending — this is the next action.**
+  Branch protection on `main` enabled by the human.
+- Phase 3 (Rehearsal ticket RT-001, "quickstart skill-name validator"):
+  **complete and merged.** All six Section 2 stages run: spec (Gate 1) →
+  ADR-001 via isolated Architect subagent (Gate 2) → tests (Stage 3,
+  genuine RED) → implementation (Stage 4, GREEN first attempt) → review
+  via isolated Reviewer subagent (Stage 5, CHANGES REQUIRED → 2 real
+  defects found and fixed, 7 tests passing) → human Gate 3 + Stage 6
+  merge (PR #3, merged to `main` as `e8e4b61`). Full detail:
+  `docs/engineering/` (specs, ADR, test evidence, review verdict),
+  `docs/engineering/traceability/matrix.md`.
+  - **Standing recommendation from this rehearsal**: run Architect and
+    Reviewer stages as isolated subagents (fresh context, no conversation
+    history) going forward, not just for rehearsals — both caught real
+    issues a same-session pass would likely have missed.
+- Phase 4 (Burn-down): ongoing policy, not a discrete task. `LEGACY.md`
+  entries enter the lifecycle only when next touched. "Adoption complete"
+  (empty `LEGACY.md`, or every remaining entry a consciously accepted
+  dated risk) not yet reached — expected, since RT-001 didn't touch any
+  existing `LEGACY.md` entry.
 
-**Active ticket: RT-001** (quickstart skill-name validator). Stages 1–5
-complete. Final PR open on branch `feat/RT-001-quickstart-skill-validator`,
-awaiting your Gate 3 review and Stage 6 merge.
+## Agentic PMO product planning (via BMAD Method, in this repo)
+
+Product brief and PRD for the **Agentic PMO** product (skills layer +
+tools layer, Jira/Confluence connector first) were drafted here via
+`bmad-product-brief` and `bmad-prd`:
+
+- `_bmad-output/planning-artifacts/briefs/brief-agentic-pmo-2026-08-02/`
+  — `brief.md`, `addendum.md`, `.memlog.md`
+- `_bmad-output/planning-artifacts/prds/prd-agentic-pmo-2026-08-02/` —
+  `prd.md`, `addendum.md`, `.memlog.md`
+
+Both were **reframed 2026-08-02** after auditing a prior working
+implementation the user shared,
+`/home/praddesilva/ProjectTeams/SRG-Apps/Apps/Copilot-PMAgentv2` (a real
+MCP server already doing Jira/Confluence read/update/create). Key
+outcomes of that reframe:
+- Issue/page **creation moved into v1 scope** (a proven reference exists).
+- **Per-user identity flagged as real, unavoidable new work** — the prior
+  app's single-shared-credential auth model does not satisfy it.
+- **Node 22.22 resolved**: an internal convention specific to that prior
+  repo, not an Atlassian requirement — Agentic PMO doesn't inherit it.
+- **New risk surfaced**: this organisation already once abandoned a
+  centrally-hosted (Azure) MCP approach for lack of subscription/admin
+  access — direct precedent risk for the incoming MCP Gateway plan.
+- **Open, unresolved**: a possible further-along parallel TypeScript
+  rewrite (`PM-Agent-Service` / `Transformation-PM-Agent-Service`)
+  referenced by stray files in the audited checkout but unverified —
+  needs the user to confirm it exists before architecture work locks in
+  `Copilot-PMAgentv2` as the primary reference.
+
+Committed on branch `Atlassian-Skills` (pushed to
+`origin/Atlassian-Skills`), not yet merged to `main` — this planning work
+was done on its own branch since it's a distinct workstream from the
+Section 11 migration/RT-001 work.
+
+**Finalized copies** of `brief.md` and `prd.md` have also been seeded into
+the new `/data/ProjectTeams/Agentic PMO` repo as that product's own
+reference docs — the canonical, living versions with full memlog audit
+trail stay here in BMAD Team.
+
+## Repo rename — what's done, what's still manual
+
+- ✅ Local folder renamed: `/data/ProjectTeams/Agentic PMO` →
+  `/data/ProjectTeams/BMAD Team` (also accessible via
+  `/home/praddesilva/ProjectTeams/BMAD Team` — same filesystem location).
+- ✅ New product repo created and seeded: `/data/ProjectTeams/Agentic PMO`
+  (git-initialized locally, not yet pushed to any GitHub remote).
+- ❌ **GitHub remote for this repo is still named `Agentic-PMO`**
+  (`praddesilva-maker/Agentic-PMO`) — renaming it requires GitHub
+  UI/API access this session doesn't have (no `gh` CLI, no admin token).
+  Manual step: rename that GitHub repo to something like `BMAD-Team`.
+- ❌ **No GitHub remote exists yet for the new Agentic PMO product repo**
+  — needs to be created (GitHub UI, `gh repo create`, or grant this
+  session a token) and then `git remote add origin ... && git push -u
+  origin main` from `/data/ProjectTeams/Agentic PMO`.
 
 ## Repo map
 
 | Path | What it is | Status |
 |---|---|---|
 | `AGENT_OPERATING_RULES.md` | The constitution | Foundational |
-| `CLAUDE.md` | Pointer to the constitution + project context placeholder | Foundational |
+| `CLAUDE.md` | Pointer to the constitution + BMAD Team identity | Foundational |
 | `quickstart.md` | BMAD agent/skill reference | Legacy — see `LEGACY.md` |
 | `STATE.md` | This file | Foundational |
 | `LEGACY.md` | Directories not yet under these rules | Foundational |
-| `docs/engineering/` | Section 10 structure | New — governed from now on |
-| `docs/` (root) | Empty; bmm `project_knowledge` scan target | Empty |
-| `_bmad/` | BMAD Method v6.10.0 install (bmm/tea/cis/gds/wds/bmad-loop/bmb/core configs) | Legacy — vendored |
+| `docs/engineering/` | Section 10 structure (RT-001's full trail) | Governed |
+| `_bmad-output/planning-artifacts/` | Agentic PMO brief + PRD (this session) | New |
+| `_bmad/` | BMAD Method v6.10.0 install | Legacy — vendored |
 | `.claude/skills/` | Vendored BMAD skill packages | Legacy — vendored |
-| `.claude/settings.json` | Hook registrations from `bmad-loop init` | Legacy — installer-managed |
-| `.bmad-loop/` | bmad-loop orchestrator state, hook script, `policy.toml` | Legacy — installer-managed |
-| `scripts/verify.sh`, `scripts/hooks/` | Section 4 gate + pre-push hook | Legacy — built ad hoc, pre-migration |
+| `.bmad-loop/` | bmad-loop orchestrator state | Legacy — installer-managed |
+| `scripts/verify.sh`, `scripts/hooks/`, `scripts/verify-quickstart-skills.sh` | Section 4 gate + RT-001's validator | Governed (RT-001) / Legacy (verify.sh) |
 | `design-artifacts/` | Empty WDS output scaffold | Empty |
-| `_bmad-output/` | Empty BMM output scaffold | Empty |
 
 ## Next action
 
-Awaiting your Gate 3 review of `docs/engineering/03-reviewer/RT-001-review.md`
-and Stage 6 (you run `./tests/scripts/verify-quickstart-skills.test.sh` and
-`./scripts/verify-quickstart-skills.sh` yourself, then merge and tag).
-Once RT-001 lands: Phase 3 is complete. Section 11 migration status at
-that point — Phases 0–3 done; Phase 4 (Burn-down) has no discrete
-task, it's the ongoing policy of pulling a `LEGACY.md` entry into the
-lifecycle only when it's next touched. "Adoption complete" (Section 11)
-requires either an empty `LEGACY.md` or every remaining entry being a
-consciously accepted, dated risk — not reached yet, since RT-001 added
-new code without touching any existing `LEGACY.md` entry. That's expected
-or the ticket would have been "small, low-risk" in name only.
+1. Review/merge `Atlassian-Skills` branch (brief + PRD) into `main` when
+   ready — currently sitting as a pushed, unmerged branch.
+2. Resolve the `PM-Agent-Service` open question (PRD §14, item 9) before
+   architecture work begins on Agentic PMO.
+3. Manual: rename this repo's GitHub remote; create a GitHub remote for
+   the new `/data/ProjectTeams/Agentic PMO` repo and push it.
+4. Whenever code work starts on Agentic PMO itself, it happens in that
+   repo, not here — this repo (BMAD Team) stays the planning/skills-
+   development workspace.
