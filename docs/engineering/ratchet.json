@@ -1,0 +1,14 @@
+{
+  "baseline_date": "2026-08-02",
+  "rule": "verify.sh fails a check only if its violation_count increases beyond this baseline. A check with status \"blocked\" has no numeric baseline yet — that is not the same as 0 violations, and must never be treated as passing. Its first real baseline is set the run it first executes successfully, which requires a human gate per Section 11's 'lowering the bar requires a human gate' — recording an initial baseline is the same kind of event.",
+  "checks": [
+    { "id": 1, "name": "type_check", "status": "blocked", "tool": null, "violation_count": null, "reason": "no stack manifest" },
+    { "id": 2, "name": "lint_format", "status": "blocked", "tool": null, "violation_count": null, "reason": "no stack manifest / no lint config" },
+    { "id": 3, "name": "test_suite", "status": "blocked", "tool": null, "violation_count": null, "reason": "no stack, no tests" },
+    { "id": 4, "name": "coverage_changed_lines", "status": "blocked", "tool": null, "violation_count": null, "reason": "no coverage tool, no baseline" },
+    { "id": 5, "name": "secret_scan", "status": "blocked", "tool": null, "violation_count": null, "reason": "no scanner installed (gitleaks/trufflehog)" },
+    { "id": 6, "name": "dependency_audit", "status": "blocked", "tool": null, "violation_count": null, "reason": "no manifest to audit" },
+    { "id": 7, "name": "sast", "status": "blocked", "tool": null, "violation_count": null, "reason": "no scanner installed (semgrep)" },
+    { "id": 8, "name": "dependency_allowlist_vs_adr", "status": "ok_after_path_fix", "tool": null, "violation_count": 0, "reason": "ADR-000 exists at docs/engineering/01-architect/adr/; nothing to allow-list yet since no dependency manifest exists" }
+  ]
+}

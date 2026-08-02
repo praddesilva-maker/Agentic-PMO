@@ -10,8 +10,18 @@ deliverable.
 
 - Phase 0 (Audit): complete. Baseline report delivered 2026-08-02; no
   application stack, no test suite, 8/8 `verify.sh` checks blocked.
-- Phase 1 (Scaffold): in progress — this PR.
-- Phase 2 (Verification + ratchet): not started.
+- Phase 1 (Scaffold): complete, gate approved 2026-08-02.
+- Phase 2 (Verification + ratchet): in progress — this PR.
+  - `scripts/verify.sh` check 8 fixed (was checking the stale `docs/adr/`
+    path; now checks the real `docs/engineering/01-architect/adr/`).
+  - `docs/engineering/ratchet.json` created — 7 of 8 checks recorded as
+    `blocked` (no stack/tools exist; explicitly not the same as a `0`
+    baseline), check 8 `ok_after_path_fix`.
+  - **Open**: branch protection on `main`. Per Section 0, no agent has
+    write access to branch-protection settings — this is a human action.
+    Recommended settings for `praddesilva-maker/Agentic-PMO` → Settings →
+    Branches → rule on `main`: require a PR before merging, require status
+    checks once CI reports `verify.sh`, disallow force pushes and deletions.
 - Phase 3 (Rehearsal ticket): not started. Planned direction (agreed
   2026-08-02): a small, non-stack-dependent addition to the BMAD tooling
   layer, run through all six Section 2 stages, rather than an arbitrary
@@ -42,5 +52,6 @@ retrospective ADR-000) exists under the Section 2 lifecycle yet.
 
 ## Next action
 
-Awaiting Phase 1 gate approval (this PR). Once approved: Phase 2 — ratchet
-baseline, branch protection on `main`.
+Awaiting Phase 2 gate approval. Blocking item: you enabling branch
+protection on `main` (see above) — everything else in Phase 2 is done.
+Once approved: Phase 3 — rehearsal ticket.
