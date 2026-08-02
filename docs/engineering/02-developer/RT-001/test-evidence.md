@@ -71,5 +71,61 @@ Command:
 
 Output:
 ```
-(pending Stage 4)
+--- test_ac1_unresolved_reference_reported ---
+  ok: AC-1: exit code is 1 when a reference is unresolved
+  ok: AC-1: unresolved name is listed
+  ok: AC-1: resolved name is not reported as unresolved
+--- test_ac2_all_resolved_with_dedup_and_no_false_positives ---
+  ok: AC-2: exit code is 0 when everything resolves
+  ok: AC-2: summary states the deduplicated count (2, not 3)
+  ok: AC-2/regression: multi-word span not treated as a candidate (Option D2, not D1)
+  ok: AC-2/regression: bare module name not treated as a candidate
+--- test_ac3_missing_quickstart_file_fails_clearly ---
+  ok: AC-3: exit code is 2 when quickstart.md is missing
+  ok: AC-3: stderr states the missing path
+  ok: AC-3: no raw bash error text leaks to stdout
+--- test_missing_skills_dir_fails_clearly ---
+  ok: Missing SKILLS_DIR: exit code is 2
+  ok: Missing SKILLS_DIR: stderr states the missing path
+--- test_real_quickstart_reports_known_stale_names ---
+  ok: Real file: exit code is 1 (known stale names present)
+  ok: Real file: bmad-wds-idun reported
+  ok: Real file: bmad-wds-saga reported
+  ok: Real file: bmad-wds-project-brief reported
+  ok: Real file: exactly 3 unresolved, no others
+
+=== 5 passed, 0 failed ===
 ```
+
+Exit code: 0. All 5 tests pass, first implementation attempt — no escalation
+trigger under Section 8 was hit (no failed attempts, not a
+concurrency/crypto/auth/money component, ADR did not flag high-risk).
+
+## NFR verification (spec's Non-functional requirements section)
+
+Read-only — code-inspection grep for file-write redirects, stderr/devnull
+redirects excluded:
+```
+$ grep -nE '>[^&]' scripts/verify-quickstart-skills.sh | grep -v '/dev/null'
+12:#   QUICKSTART_FILE defaults to <repo-root>/quickstart.md
+13:#   SKILLS_DIR      defaults to <repo-root>/.claude/skills
+```
+Both remaining matches are `<repo-root>` inside comment text, not redirect
+operators — zero real file-write redirects in the script.
+
+No network — code-inspection grep:
+```
+$ grep -nE 'curl|wget|nc |ssh |scp ' scripts/verify-quickstart-skills.sh
+(no output)
+```
+
+Sub-second runtime, run against the real (larger) `quickstart.md`/`.claude/skills`:
+```
+$ time ./scripts/verify-quickstart-skills.sh >/dev/null
+real	0m0.579s
+user	0m0.213s
+sys	0m0.489s
+```
+
+No new dependencies — script uses only bash builtins plus `grep`/`sed`/`sort`,
+already relied upon by `scripts/verify.sh`. No manifest file added anywhere.
