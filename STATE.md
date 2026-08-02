@@ -1,6 +1,6 @@
 # STATE.md
 
-_Last updated: 2026-08-02 (RT-001 Stage 1+2)_
+_Last updated: 2026-08-02 (RT-001 Stage 1-5 complete, awaiting Gate 3 + Stage 6)_
 
 ## Where we are
 
@@ -48,11 +48,38 @@ deliverable.
     confirmation. Expected to resolve once a real stack exists and
     `verify.sh` can actually pass; until then this is a repeat-friction
     point worth deciding a standing policy for for future tickets.
-- Phase 4 (Burn-down): not started.
+  - Stage 3 (tests): complete. 5 tests written against ADR-001 before the
+    script existed; genuine RED (0 passed, 5 failed, every failure a real
+    assertion mismatch — see `docs/engineering/02-developer/RT-001/test-evidence.md`).
+  - Stage 4 (implementation): complete.
+    `scripts/verify-quickstart-skills.sh`, all 5 tests GREEN on the first
+    attempt. NFRs (read-only, no network, sub-second, no new deps) verified
+    with evidence, not just claimed.
+  - Stage 5 (review): complete, **CHANGES REQUIRED then fixed**. Run as an
+    isolated `Plan` subagent in a fresh git worktree — genuinely separate
+    context, not role-play, per Section 1. Full verdict:
+    `docs/engineering/03-reviewer/RT-001-review.md`.
+    **Friction note**: the isolated reviewer earned its keep a second
+    time. It independently re-ran everything (didn't trust any of the
+    Developer's pasted output), reproduced the RED state from an earlier
+    commit itself, and found two real, reproducible defects the Developer
+    stage missed entirely: an unreadable `quickstart.md` silently passing
+    (exit 0) instead of the exit 2 the ADR itself documents for that case,
+    and a stray/unbalanced backtick silently dropping a real reference
+    with no signal at all — worse than a risk the ADR explicitly already
+    accepted. It also caught a false claim in the Developer's own commit
+    message (asserted `STATE.md` was updated; it wasn't). Both defects
+    fixed, 2 regression tests added (7 total), all passing. This is
+    strong evidence the separate-session Architect/Reviewer pattern is
+    worth the mechanical overhead noted above, not just a rehearsal-only
+    cost — recommend keeping it as the standing pattern going forward,
+    not just for this rehearsal.
+  - Gate 3 (human reviews the verdict) and Stage 6 (human runs it,
+    merges, tags): **pending — this is the next action.**
 
-**Active ticket: RT-001** (quickstart skill-name validator). Stage 1 and
-Stage 2 both signed off; Stage 3 (tests) starts once the spec+ADR PR
-merges to `main`.
+**Active ticket: RT-001** (quickstart skill-name validator). Stages 1–5
+complete. Final PR open on branch `feat/RT-001-quickstart-skill-validator`,
+awaiting your Gate 3 review and Stage 6 merge.
 
 ## Repo map
 
@@ -75,6 +102,14 @@ merges to `main`.
 
 ## Next action
 
-Awaiting review/merge of `docs/RT-001-spec-design` into `main`. Once
-merged: branch `feat/RT-001-quickstart-skill-validator` from `main`,
-start Stage 3 (tests first).
+Awaiting your Gate 3 review of `docs/engineering/03-reviewer/RT-001-review.md`
+and Stage 6 (you run `./tests/scripts/verify-quickstart-skills.test.sh` and
+`./scripts/verify-quickstart-skills.sh` yourself, then merge and tag).
+Once RT-001 lands: Phase 3 is complete. Section 11 migration status at
+that point — Phases 0–3 done; Phase 4 (Burn-down) has no discrete
+task, it's the ongoing policy of pulling a `LEGACY.md` entry into the
+lifecycle only when it's next touched. "Adoption complete" (Section 11)
+requires either an empty `LEGACY.md` or every remaining entry being a
+consciously accepted, dated risk — not reached yet, since RT-001 added
+new code without touching any existing `LEGACY.md` entry. That's expected
+or the ticket would have been "small, low-risk" in name only.
